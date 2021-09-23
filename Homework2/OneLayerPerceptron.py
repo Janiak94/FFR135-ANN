@@ -115,7 +115,7 @@ if __name__ == "__main__":
     #############################
     # Number of neurons in each layer
     #############################
-    M1 = 10 # Number of hidden neurons
+    M1 = 20 # Number of hidden neurons
     input_size = training_data.shape[1] - 1 # Subtract 1 for the labels
     output_size = 1
     layer_sizes = [input_size, M1, output_size]
@@ -128,8 +128,8 @@ if __name__ == "__main__":
     #############################
     # Run stochastic gradient descent
     #############################
-    n_epoch = 5000
-    learning_rate = 5e-4
+    n_epoch = 2000
+    learning_rate = 1e-2
     batch_size = 50
     (weights, tresholds) = stochastic_gradient_descent(
         training_data,
@@ -142,29 +142,46 @@ if __name__ == "__main__":
     #############################
     # Predict
     #############################
-    pred = []
+    pred_train = []
+    pred_val = []
     for i in range(training_data.shape[0]):
         output = feed_forward(training_data[i,0:2], weights, tresholds)
-        pred.append(output)
+        pred_train.append(output)
+    for i in range(validation_data.shape[0]):
+        output = feed_forward(validation_data[i,0:2], weights, tresholds)
+        pred_val.append(output)
 
     #############################
     # Classification error on validation data set
     #############################
-    c_error = 0
+    c_error_val = 0
+    c_error_train = 0
     for i in range(validation_data.shape[0]):
         output = feed_forward(validation_data[i,0:2], weights, tresholds)
-        c_error += np.abs(output - validation_data[i,2])
-    c_error /= 2 * validation_data.shape[0]
-    print("Classification error on validation data set: {:.4f}".format(c_error))
+        c_error_val += np.abs(output - validation_data[i,2])
+    for i in range(training_data.shape[0]):
+        output = feed_forward(training_data[i,0:2], weights, tresholds)
+        c_error_train += np.abs(output - training_data[i,2])
+    c_error_val /= 2 * validation_data.shape[0]
+    c_error_train /= 2 * training_data.shape[0]
+    print("Classification error on validation data set: {:.4f}".format(c_error_val))
+    print("Classification error on training data set: {:.4f}".format(c_error_train))
 
     #############################
     # Plot training data and predicted data
     #############################
-    fig, (ax1, ax2) = plt.subplots(1, 2)
-    ax1.scatter(training_data[:,0], training_data[:,1], c=training_data[:,-1], s=1)
-    ax2.scatter(training_data[:,0], training_data[:,1], c=pred, s=1)
+    fig, axs = plt.subplots(2, 2)
+    axs[0,0].scatter(training_data[:,0], training_data[:,1], c=training_data[:,-1], s=1)
+    axs[0,1].scatter(training_data[:,0], training_data[:,1], c=pred_train, s=1)
+    axs[1,0].scatter(validation_data[:,0], validation_data[:,1], c=validation_data[:,-1], s=1)
+    axs[1,1].scatter(validation_data[:,0], validation_data[:,1], c=pred_val, s=1)
+
+    axs[0,0].title.set_text("Training data")
+    axs[0,1].title.set_text("Prediction on training data")
+    axs[1,0].title.set_text("Validation data")
+    axs[1,1].title.set_text("Prediction on validation data")
+
     plt.show()
-    plt.plot()
 
     #############################
     # Save network paramters
