@@ -58,7 +58,7 @@ class Boltzman:
 		p0 = 4
 		input_data = input_data.copy()
 		for i in range(n_iter):
-			if (i % 10000 == 0):
+			if (i % 100 == 0):
 				print(r"Iteration {}/{}".format(i, n_iter))
 			# Sample patterns from input_data
 			patterns = input_data[:, np.random.choice(input_data.shape[1], p0)]
@@ -87,8 +87,8 @@ patterns = np.matrix(
 	[1, -1, 1]]
 	).T
 
-n_iter = 40000
-k = 10
+n_iter = 100
+k = 100
 learning_rate = 0.1
 network = Boltzman(N_VISIBLE, N_HIDDEN)
 print(network.weights)
